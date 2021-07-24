@@ -19,7 +19,7 @@ if (Test-Path $id_rsa)
     $q = Read-Host -Prompt "Generate now? (yes/no)"
     if ($q -eq "yes"){
 
-        mkdir C:\Users\$env:UserName\.ssh\ 2> $null
+        mkdir C:\Users\$env:UserName\.ssh\ 2>&1 $null
         ssh-keygen -f "C:\Users\$env:UserName\.ssh\id_rsa"
         .\ssh-copy-id.ps1
     }else{
