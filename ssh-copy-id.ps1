@@ -4,13 +4,26 @@ if (Test-Path $id_rsa)
     Clear-Host
     $server = Read-Host -Prompt 'Input your server  name or Ip'
     $user = Read-Host -Prompt 'Username ssh'
-    scp $id_rsa $user@$server':'/home/$user/
-    ssh $user@$server "if [ ! -f /home/alejandro/.ssh/authorized_keys ]; then mkdir /home/alejandro/.ssh ; touch /home/alejandro/.ssh/authorized_keys ; fi"
-    ssh $user@$server "cat /home/$user/id_rsa.pub >> /home/$user/.ssh/authorized_keys && rm -f /home/$user/id_rsa.pub && chmod 700 /home/$user/.ssh/ && chmod 600 /home/$user/.ssh/authorized_keys"
-    
-    Clear-Host
-    Write-Host "Process completed successfully!"
-    Write-Host "Now you can connect with - ssh $user@$server"
+    $port = Read-Host -Prompt 'Port'
+    scp -P $port $id_rsa  $user@$server':'/home/$user/ 
+    Write-Host ":a:"
+    ssh $user@$server -p $port "if [ ! -f /home/$user/.ssh/authorized_keys ]; then mkdir /home/$user/.ssh ; touch /home/$user/.ssh/authorized_keys ; fi"
+    if ($?){
+
+        ssh $user@$server -p $port "cat /home/$user/id_rsa.pub >> /home/$user/.ssh/authorized_keys && rm -f /home/$user/id_rsa.pub && chmod 700 /home/$user/.ssh/ && chmod 600 /home/$user/.ssh/authorized_keys"
+        if($?){
+
+            Clear-Host
+            Write-Host "Process completed successfully!"
+            Write-Host "Now you can connect with - ssh $user@$server -p $port"
+        }else{
+
+            Write-Host "Error"
+        }
+    }else{
+
+        Write-Host "Error"
+    }
 
 }else{
 
