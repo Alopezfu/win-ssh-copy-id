@@ -67,10 +67,12 @@ function checkInput($options) {
 function publicKey {
     
     spawnBanner;
+    Write-Host -NoNewline -ForegroundColor Yellow "[*] "
     Write-Host -NoNewline -ForegroundColor DarkCyan "You need create a public key. Generate now? (yes/no): "
     $q = Read-Host;
     spawnBanner;
-    Write-Host -ForegroundColor DarkCyan "[*] Generate public key..."
+    Write-Host -NoNewline -ForegroundColor Yellow "[*] "
+    Write-Host -ForegroundColor DarkCyan "Generate public key..."
     if ($q -eq "yes") {
 
         mkdir $env:USERPROFILE\.ssh\ 2>&1> $null
@@ -81,25 +83,37 @@ function publicKey {
 function configHost($data) {
     
     spawnBanner;
-    Write-Host -ForegroundColor DarkCyan "[*] Config remote ssh..."
+    Write-Host -NoNewline -ForegroundColor Yellow "[*] "
+    Write-Host -ForegroundColor DarkCyan "Config remote ssh..."
     $hostname = $data[0];
     $username = $data[1];
     $port = $data[2];
-    scp -o StrictHostKeyChecking=no -P "$port" $env:USERPROFILE\.ssh\id_rsa.pub $username'@'$hostname':/home/'$username
+    scp -o StrictHostKeyChecking=no -P $port $env:USERPROFILE\.ssh\id_rsa.pub $username'@'$hostname':/home/'$username
     
     spawnBanner;
-    Write-Host -ForegroundColor DarkCyan "[*] Config remote ssh..."
+    Write-Host -NoNewline -ForegroundColor Yellow "[*] "
+    Write-Host -ForegroundColor DarkCyan "Config remote ssh..."
     ssh $username@$hostname -p $port "if [ ! -f /home/$username/.ssh/authorized_keys ]; then mkdir /home/$username/.ssh ; touch /home/$username/.ssh/authorized_keys ; fi ; cat /home/$username/id_rsa.pub >> /home/$username/.ssh/authorized_keys && rm -f /home/$username/id_rsa.pub && chmod 700 /home/$username/.ssh/ && chmod 600 /home/$username/.ssh/authorized_keys"
+
+    if ($?){
+
+        spawnBanner;
+        Write-Host -NoNewline -ForegroundColor Yellow "[*] "
+        Write-Host -NoNewline -ForegroundColor DarkCyan "Successful. Connect with "
+        Write-Host -ForegroundColor Green "ssh $username@$hostname -p $port"
+    }
+
 }
 
 function main($data) {
-    
-    if (-not(Test-Path "$env:USERPROFILE\.ssh\id_rsa.pub")) {
-        
-        publicKey;
-    }
 
-    configHost(checkInput($data));
+    if ($data.Count -gt 3) {
+        publicKey;
+        configHost(checkInput($data));
+    }else{
+
+        help;
+    }
 }
 
 main($args);
