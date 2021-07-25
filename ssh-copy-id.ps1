@@ -18,7 +18,7 @@ function spawnBanner {
 
 function help {
     spawnBanner;
-    Write-Host -ForegroundColor DarkCyan "Usage: .\ssh-copy-id.ps1 [OPTION]
+    Write-Host -ForegroundColor DarkCyan "Usage: .\ssh-copy-id.ps1 [OPTIONS]
 
 Options:
   -h, --host    Set remote hostname or IP.
