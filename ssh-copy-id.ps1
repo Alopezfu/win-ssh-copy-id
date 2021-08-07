@@ -4,15 +4,15 @@
 function spawnBanner {
 
     Clear-Host;
-    Write-Host -ForegroundColor Green "    __          ___          _____     _        _____                    _____    _
+    Write-Host -ForegroundColor Green "    __          ___          _____     _        _____                    _____    _ 
     \ \        / (_)        / ____|   | |      / ____|                  |_   _|  | |
      \ \  /\  / / _ _ __   | (___  ___| |__   | |     ___  _ __  _   _    | |  __| |
       \ \/  \/ / | | '_ \   \___ \/ __| '_ \  | |    / _ \| '_ \| | | |   | | / _` |
        \  /\  /  | | | | |  ____) \__ \ | | | | |___| (_) | |_) | |_| |  _| || (_| |
         \/  \/   |_|_| |_| |_____/|___/_| |_|  \_____\___/| .__/ \__, | |_____\__,_|
-                                                          | |     __/ |
-               Author: github.com/alopezfu                |_|    |___/
-
+                                                          | |     __/ |             
+               Author: github.com/alopezfu                |_|    |___/   
+                               
 ";
 }
 
@@ -25,12 +25,12 @@ Options:
   -u, --user    Set remote username.
   -p, --port    Set remote port with '' (If not set default value is 22).
   --help        Show help.
-
+  
 Examples:
   .\ssh-copy-id.ps1 --host srv0.mydoamin.com --user admin --port '25'
-  .\ssh-copy-id.ps1 -h srv0.myanotherdoamin.com -u pepe
+  .\ssh-copy-id.ps1 -h srv0.myanotherdoamin.com -u pepe 
   "
-
+    
 }
 
 function checkInput($options) {
@@ -49,6 +49,8 @@ function checkInput($options) {
 
             $port = "22";
         }
+        
+        
     }
     else {
 
@@ -63,9 +65,9 @@ function checkInput($options) {
 }
 
 function publicKey {
-
+    
     spawnBanner;
-    if (!Test-Path $env:USERPROFILE\.ssh\id_rsa) {
+    if (-Not (Test-Path $env:USERPROFILE\.ssh\id_rsa)) {
 
         Write-Host -NoNewline -ForegroundColor Yellow "[*] "
         Write-Host -NoNewline -ForegroundColor DarkCyan "You need create a public key. Generate now? (yes/no): "
@@ -82,7 +84,7 @@ function publicKey {
 }
 
 function configHost($data) {
-
+    
     spawnBanner;
     Write-Host -NoNewline -ForegroundColor Yellow "[*] "
     Write-Host -ForegroundColor DarkCyan "Config remote ssh..."
@@ -90,7 +92,7 @@ function configHost($data) {
     $username = $data[1];
     $port = $data[2];
     scp -o StrictHostKeyChecking=no -P $port $env:USERPROFILE\.ssh\id_rsa.pub $username'@'$hostname':/home/'$username
-
+    
     spawnBanner;
     Write-Host -NoNewline -ForegroundColor Yellow "[*] "
     Write-Host -ForegroundColor DarkCyan "Config remote ssh..."
@@ -103,6 +105,7 @@ function configHost($data) {
         Write-Host -NoNewline -ForegroundColor DarkCyan "Successful. Connect with "
         Write-Host -ForegroundColor Green "ssh $username@$hostname -p $port"
     }
+
 }
 
 function main($data) {
