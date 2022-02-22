@@ -50,7 +50,6 @@ function checkInput($options) {
             $port = "22";
         }
         
-        
     }
     else {
 
@@ -67,16 +66,16 @@ function checkInput($options) {
 function publicKey {
     
     spawnBanner;
-    if (-Not (Test-Path $env:USERPROFILE\.ssh\id_rsa)) {
+    if (-Not (Test-Path $env:USERPROFILE\.ssh\id_rsa) -Or -Not (Test-Path $env:USERPROFILE\.ssh\id_rsa.pub) ) {
 
         Write-Host -NoNewline -ForegroundColor Yellow "[*] "
-        Write-Host -NoNewline -ForegroundColor DarkCyan "You need create a public key. Generate now? (yes/no): "
-        $q = Read-Host;
-        spawnBanner;
-        Write-Host -NoNewline -ForegroundColor Yellow "[*] "
-        Write-Host -ForegroundColor DarkCyan "Generate public key..."
+        Write-Host -NoNewline -ForegroundColor DarkCyan "You need create a public/private key. Generate now? (yes/no): "
+        $q = Read-Host;        
         if ($q -eq "yes") {
 
+            spawnBanner;
+            Write-Host -NoNewline -ForegroundColor Yellow "[*] "
+            Write-Host -ForegroundColor DarkCyan "Generate public/private key..."
             mkdir $env:USERPROFILE\.ssh\ 2>&1> $null
             ssh-keygen -f "$env:USERPROFILE\.ssh\id_rsa"
         }
@@ -87,16 +86,17 @@ function configHost($data) {
     
     spawnBanner;
     Write-Host -NoNewline -ForegroundColor Yellow "[*] "
-    Write-Host -ForegroundColor DarkCyan "Config remote ssh..."
+    Write-Host -ForegroundColor DarkCyan "Copy public key to remote ssh..."
     $hostname = $data[0];
     $username = $data[1];
     $port = $data[2];
-    scp -o StrictHostKeyChecking=no -P $port $env:USERPROFILE\.ssh\id_rsa.pub $username'@'$hostname':/home/'$username
+    $userHome = ssh $username@$hostname -p $port "echo $userHome";
+    scp -o StrictHostKeyChecking=no -P $port $env:USERPROFILE\.ssh\id_rsa.pub $username'@'$hostname':'$userHome'/'$username
     
     spawnBanner;
     Write-Host -NoNewline -ForegroundColor Yellow "[*] "
     Write-Host -ForegroundColor DarkCyan "Config remote ssh..."
-    ssh $username@$hostname -p $port "if [ ! -f /home/$username/.ssh/authorized_keys ]; then mkdir /home/$username/.ssh ; touch /home/$username/.ssh/authorized_keys ; fi ; cat /home/$username/id_rsa.pub >> /home/$username/.ssh/authorized_keys && rm -f /home/$username/id_rsa.pub && chmod 700 /home/$username/.ssh/ && chmod 600 /home/$username/.ssh/authorized_keys"
+    ssh $username@$hostname -p $port "[[ ! -f $userHome/$username/.ssh/authorized_keys ]] && mkdir $userHome/root/.ssh ; touch $userHome/$username/.ssh/authorized_keys ; cat $userHome/$username/id_rsa.pub >> $userHome/$username/.ssh/authorized_keys && rm -f $userHome/$username/id_rsa.pub && chmod 700 $userHome/$username/.ssh/ && chmod 600 $userHome/$username/.ssh/authorized_keys"
 
     if ($?) {
 
