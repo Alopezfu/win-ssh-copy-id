@@ -90,13 +90,13 @@ function configHost($data) {
     $hostname = $data[0];
     $username = $data[1];
     $port = $data[2];
-    $userHome = ssh $username@$hostname -p $port "echo $userHome";
-    scp -o StrictHostKeyChecking=no -P $port $env:USERPROFILE\.ssh\id_rsa.pub $username'@'$hostname':'$userHome'/'$username
+    $userHome = ssh $username@$hostname -p $port "echo `$HOME";
+    scp -o StrictHostKeyChecking=no -P $port $env:USERPROFILE\.ssh\id_rsa.pub $username'@'$hostname':'$userHome'/'
     
     spawnBanner;
     Write-Host -NoNewline -ForegroundColor Yellow "[*] "
     Write-Host -ForegroundColor DarkCyan "Config remote ssh..."
-    ssh $username@$hostname -p $port "[[ ! -f $userHome/$username/.ssh/authorized_keys ]] && mkdir $userHome/root/.ssh ; touch $userHome/$username/.ssh/authorized_keys ; cat $userHome/$username/id_rsa.pub >> $userHome/$username/.ssh/authorized_keys && rm -f $userHome/$username/id_rsa.pub && chmod 700 $userHome/$username/.ssh/ && chmod 600 $userHome/$username/.ssh/authorized_keys"
+    ssh $username@$hostname -p $port "[[ ! -f $userHome/.ssh/authorized_keys ]] && mkdir $userHome/.ssh ; touch $userHome/.ssh/authorized_keys ; cat $userHome/id_rsa.pub >> $userHome/.ssh/authorized_keys && rm -f $userHome/id_rsa.pub && chmod 700 $userHome/.ssh/ && chmod 600 $userHome/.ssh/authorized_keys"
 
     if ($?) {
 
